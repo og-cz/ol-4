@@ -7,7 +7,8 @@
  *   -> output op-amp (slew + HF grit)
  * Sidechain (LA-4A): LED driven mostly by the attenuated signal (feedback) plus a little
  *   of the input (feedforward), 4x interpolated; soft diode turn-on (2:1 = soft knee);
- *   CdS photocell rises faster with more light, and recovers in the conductance domain.
+ *   CdS photocell rises faster with more light, recovers in the conductance domain,
+ *   and recovers more slowly the longer it has been lit (memory).
  * Calibration: 0 dBFS = +20 dBu. Zero latency. No allocation in process().
  */
 #pragma once
@@ -103,11 +104,15 @@ public:
                     if (tau < 0.0003) tau = 0.0003;
                     G += (Gt - G) * (1 - std::exp(-1 / (tau * fs)));
                 } else {
-                    const double tau = kTauRel * relScale;
+                    const double tau = (kTauRel + kTauRelMem * std::pow(st.mem[c], 1.3)) * relScale;
                     G = Gt + (G - Gt) * std::exp(-1 / (tau * fs));
                 }
                 st.G[c] = G;
                 const double gr = 20 * std::log10(1 + G);
+                if (gr > 1) {
+                    const double goal = std::min(1.0, gr / 4);
+                    if (goal > st.mem[c]) st.mem[c] += (goal - st.mem[c]) * memUp;
+                } else st.mem[c] -= st.mem[c] * memDn;
                 grMax = std::max(grMax, gr);
 
                 double y = xs[c] / (1 + G);
