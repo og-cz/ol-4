@@ -38,7 +38,7 @@ jobs:
         run: |
           EXTRA=""
           if [ "$RUNNER_OS" == "macOS" ]; then EXTRA="-DCMAKE_OSX_ARCHITECTURES=arm64;x86_64"; fi
-          if [ "$RUNNER_OS" == "Linux" ]; then EXTRA="-G Ninja"; fi
+          if [ "$RUNNER_OS" == "Linux" ]; then EXTRA="-G Ninja -DOL4_BUILD_HOSTTEST=ON"; fi
           cmake -S . -B build -DCMAKE_BUILD_TYPE=Release $EXTRA
 
       - name: Build
@@ -52,6 +52,11 @@ jobs:
           BIN=$(find build -type f \( -name ol4_engine_match -o -name ol4_engine_match.exe \) | head -1)
           "$BIN" build/ref
 
+      - name: Host test (load the VST3 and compare its audio)
+        if: runner.os == 'Linux'
+        run: |
+          xvfb-run -a ./build/ol4_hosttest_artefacts/Release/ol4_hosttest "build/OL4_artefacts/Release/VST3/OL-4 Optical Leveler.vst3" build/ref
+
       - name: Ad-hoc sign (macOS)
         if: runner.os == 'macOS'
         run: |
@@ -60,6 +65,26 @@ jobs:
                    "build/OL4_artefacts/Release/Standalone/OL-4 Optical Leveler.app"; do
             codesign --force --deep --sign - "$b"
           done
+
+      - name: pluginval (strictness 10)
+        shell: bash
+        run: |
+          case "$RUNNER_OS" in
+            Windows) ZIP=pluginval_Windows.zip; EXE=./pluginval.exe ;;
+            macOS)   ZIP=pluginval_macOS.zip;   EXE=./pluginval.app/Contents/MacOS/pluginval ;;
+            Linux)   ZIP=pluginval_Linux.zip;   EXE=./pluginval ;;
+          esac
+          curl -sSL -o pv.zip "https://github.com/Tracktion/pluginval/releases/latest/download/$ZIP"
+          unzip -q pv.zip
+          VST3=$(find build -type d -name "OL-4 Optical Leveler.vst3" | grep -v "/Contents/" | head -1)
+          if [ "$RUNNER_OS" == "Linux" ]; then RUN="xvfb-run -a"; else RUN=""; fi
+          $RUN $EXE --strictness-level 10 --validate-in-process --skip-gui-tests --timeout-ms 600000 --validate "$VST3"
+          if [ "$RUNNER_OS" == "macOS" ]; then
+            mkdir -p ~/Library/Audio/Plug-Ins/Components
+            cp -R "build/OL4_artefacts/Release/AU/OL-4 Optical Leveler.component" ~/Library/Audio/Plug-Ins/Components/
+            killall -9 AudioComponentRegistrar || true
+            auval -v aufx Ol4a OlAu
+          fi
 
       - name: Package (Windows installer)
         if: runner.os == 'Windows'
