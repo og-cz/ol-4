@@ -1,0 +1,23 @@
+OL-4 Optical Leveler for macOS (Apple Silicon and Intel)
+
+EASY WAY
+  Open "OL-4-macOS-Installer-1.0.0.pkg". It installs:
+    VST3 -> /Library/Audio/Plug-Ins/VST3
+    AU   -> /Library/Audio/Plug-Ins/Components
+    App  -> /Applications
+  The package is not notarized by Apple yet, so macOS will block it the first time.
+  Right-click (or Control-click) the .pkg, choose Open, then Open again.
+  If macOS still refuses: System Settings > Privacy & Security > "Open Anyway".
+
+IF A DAW DOES NOT SEE THE PLUGIN
+  Open Terminal and run:
+    sudo xattr -dr com.apple.quarantine "/Library/Audio/Plug-Ins/VST3/OL-4 Optical Leveler.vst3"
+    sudo xattr -dr com.apple.quarantine "/Library/Audio/Plug-Ins/Components/OL-4 Optical Leveler.component"
+  Then rescan plugins in your DAW (Logic: restart Logic; it re-checks Audio Units).
+
+FL STUDIO (Mac)
+  Options > Manage plugins > Find installed plugins.
+
+PRO TOOLS
+  Pro Tools only loads AAX plugins. AAX needs Avid's free developer program and PACE signing;
+  see README for how to enable it.
