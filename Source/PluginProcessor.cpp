@@ -87,6 +87,7 @@ juce::AudioProcessorEditor* OL4Processor::createEditor() { return new OL4Editor 
 void OL4Processor::getStateInformation (juce::MemoryBlock& destData)
 {
     auto state = apvts.copyState();
+    state.setProperty ("uiScale", editorScale100.load(), nullptr);
     if (auto xml = state.createXml()) copyXmlToBinary (*xml, destData);
 }
 
@@ -96,6 +97,7 @@ void OL4Processor::setStateInformation (const void* data, int sizeInBytes)
         if (xml->hasTagName (apvts.state.getType()))
         {
             auto vt = juce::ValueTree::fromXml (*xml);
+            if (vt.hasProperty ("uiScale")) editorScale100.store ((int) vt.getProperty ("uiScale"));
             apvts.replaceState (vt);
         }
 }

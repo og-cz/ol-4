@@ -74,7 +74,7 @@ OL4Editor::OL4Editor (OL4Processor& p) : AudioProcessorEditor (&p), processor (p
     setResizable (true, true);
     getConstrainer()->setFixedAspectRatio ((double) kImgW / kImgH);
     setResizeLimits (kImgW * 30 / 100, kImgH * 30 / 100, kImgW * 110 / 100, kImgH * 110 / 100);
-    const int s100 = 80;
+    const int s100 = jlimit (30, 110, processor.editorScale100.load());
     setSize (kImgW * s100 / 100, kImgH * s100 / 100);
     lamp = 0.0;
     lastTime = Time::getMillisecondCounterHiRes() * 0.001;
@@ -84,6 +84,7 @@ OL4Editor::OL4Editor (OL4Processor& p) : AudioProcessorEditor (&p), processor (p
 void OL4Editor::resized()
 {
     scale = (float) getWidth() / (float) kImgW;
+    processor.editorScale100.store (roundToInt (scale * 100.0f));
     cache = {};
 }
 

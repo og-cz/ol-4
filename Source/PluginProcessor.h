@@ -40,6 +40,7 @@ public:
     // read by the editor (meters)
     std::atomic<float> grDb { 0.0f }, vu4 { -60.0f }, vu8 { -60.0f };
     std::atomic<int> overloadCount { 0 };
+    std::atomic<int> editorScale100 { 80 };   // remembered window size
 
     static constexpr int kRatios[5] = { 2, 4, 8, 12, 20 };
 
