@@ -260,9 +260,9 @@ void OL4Editor::timerCallback()
     else if (m == 0) target = vuPos (-processor.grDb.load());
     else target = vuPos (m == 1 ? processor.vu4.load() : processor.vu8.load());
     const int steps = jmax (1, (int) std::ceil (dt / 0.004)); const double h = dt / steps;
-    for (int i = 0; i < steps; ++i)          // VU ballistics
+    for (int i = 0; i < steps; ++i)          // VU ballistics: ~300 ms to 99 %, ~1.5 % overshoot
     {
-        const double wn = 14.0, z = 0.7;
+        const double wn = 19.0, z = 0.8;
         const double acc = wn * wn * (target - needle) - 2 * z * wn * needleV;
         needleV += acc * h; needle += needleV * h;
         if (needle < -0.05) { needle = -0.05; needleV = std::abs (needleV) * 0.25; }
