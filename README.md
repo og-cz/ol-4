@@ -13,9 +13,7 @@ Independent project; not affiliated with Universal Audio, UREI or JBL.
 
 ## Download
 
-Every push builds installers on GitHub Actions. Open the **Actions** tab, pick the latest green run and
-download **OL-4-Windows** or **OL-4-macOS** under *Artifacts*. Tagged versions (`v1.0.0`, …) also appear
-under **Releases**. Install notes: `installer/INSTALL-Windows.txt`, `installer/INSTALL-macOS.txt`.
+Get the latest installer for Windows or macOS from **Releases**.
 
 ## Controls (same as the hardware)
 
@@ -62,9 +60,6 @@ You need an internet connection the first time (CMake downloads JUCE 9.0.4 autom
    `build\OL4_artefacts\Release\Standalone\OL-4 Optical Leveler.exe`.
 5. In FL Studio: *Options > Manage plugins > Find installed plugins*, then load it on a mixer insert.
 
-Optional installer: install Inno Setup 6 and run
-`ISCC /DSrcDir="C:\ol4-plugin\build\OL4_artefacts\Release" installer\windows.iss`.
-
 ### macOS (Apple Silicon or Intel)
 
 1. Install **Xcode** from the App Store, open it once, then in Terminal run `xcode-select --install`.
@@ -81,13 +76,11 @@ Optional installer: install Inno Setup 6 and run
    cp -R "build/OL4_artefacts/Release/AU/OL-4 Optical Leveler.component" ~/Library/Audio/Plug-Ins/Components/
    ```
    Plugins you build on your own Mac are not blocked by Gatekeeper.
-4. Optional installer package: `bash installer/make-macos-pkg.sh 1.0.0 build/OL4_artefacts/Release dist`.
 
-### Automatic builds (later, optional)
+### Automatic builds
 
-If you put this folder in a GitHub repository, `.github/workflows/build.yml` builds the Windows installer,
-the macOS installer and a Linux build on every push, runs the tests and pluginval, and attaches the
-installers to a release when you push a tag such as `v1.0.0`.
+`.github/workflows/build.yml` builds Windows, macOS and Linux zips on every push and runs the tests
+and pluginval.
 
 ## Pro Tools (AAX)
 

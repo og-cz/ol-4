@@ -86,19 +86,21 @@ jobs:
             auval -v aufx Ol4a OlAu
           fi
 
-      - name: Package (Windows installer)
+      - name: Package (Windows)
         if: runner.os == 'Windows'
         shell: pwsh
         run: |
           New-Item -ItemType Directory -Force dist | Out-Null
-          $iscc = "C:\Program Files (x86)\Inno Setup 6\ISCC.exe"
-          if (-not (Test-Path $iscc)) { choco install innosetup -y --no-progress | Out-Null }
-          & $iscc /DAppVersion=1.0.0 /DSrcDir="$PWD\build\OL4_artefacts\Release" /O"$PWD\dist" installer\windows.iss
-          Compress-Archive -Path "build\OL4_artefacts\Release\VST3\OL-4 Optical Leveler.vst3", "build\OL4_artefacts\Release\Standalone\OL-4 Optical Leveler.exe", "installer\INSTALL-Windows.txt" -DestinationPath "dist\OL-4-Windows-manual.zip"
+          Compress-Archive -Path "build\OL4_artefacts\Release\VST3\OL-4 Optical Leveler.vst3", "build\OL4_artefacts\Release\Standalone\OL-4 Optical Leveler.exe" -DestinationPath "dist\OL-4-Windows.zip"
 
-      - name: Package (macOS installer)
+      - name: Package (macOS)
         if: runner.os == 'macOS'
-        run: bash installer/make-macos-pkg.sh 1.0.0 build/OL4_artefacts/Release dist
+        run: |
+          mkdir -p dist
+          cd build/OL4_artefacts/Release
+          ditto -c -k --keepParent "VST3/OL-4 Optical Leveler.vst3" ../../../dist/OL-4-macOS-VST3.zip
+          ditto -c -k --keepParent "AU/OL-4 Optical Leveler.component" ../../../dist/OL-4-macOS-AU.zip
+          ditto -c -k --keepParent "Standalone/OL-4 Optical Leveler.app" ../../../dist/OL-4-macOS-Standalone.zip
 
       - name: Package (Linux)
         if: runner.os == 'Linux'
