@@ -18,12 +18,18 @@ else()
     FetchContent_MakeAvailable(JUCE)
 endif()
 
+# Pro Tools (AAX): needs Avid's AAX SDK (free developer account). Pass -DOL4_AAX_SDK=/path/to/aax-sdk
+set(OL4_AAX_SDK "" CACHE PATH "Path to the Avid AAX SDK (optional)")
 set(OL4_FORMATS VST3 Standalone)
 if(APPLE)
     list(APPEND OL4_FORMATS AU)
 endif()
 if(UNIX AND NOT APPLE)
     list(APPEND OL4_FORMATS LV2)
+endif()
+if(OL4_AAX_SDK)
+    juce_set_aax_sdk_path(${OL4_AAX_SDK})
+    list(APPEND OL4_FORMATS AAX)
 endif()
 
 juce_add_plugin(OL4
@@ -42,6 +48,7 @@ juce_add_plugin(OL4
     EDITOR_WANTS_KEYBOARD_FOCUS FALSE
     VST3_CATEGORIES Fx Dynamics
     AU_MAIN_TYPE kAudioUnitType_Effect
+    AAX_CATEGORY Dynamics
     LV2URI "https://github.com/olaudio/ol4"
     COPY_PLUGIN_AFTER_BUILD FALSE
     NEEDS_WEB_BROWSER FALSE

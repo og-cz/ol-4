@@ -3,7 +3,7 @@
 A solid-state opto compressor/limiter plugin modeled on the behavior of the late-70s UREI LA-4 / LA-4A.
 Independent project; not affiliated with Universal Audio, UREI or JBL.
 
-**Formats:** VST3 (Windows, macOS, Linux) · AU (macOS) · Standalone app · LV2 (Linux)
+**Formats:** VST3 (Windows, macOS, Linux) · AU (macOS) · Standalone app · LV2 (Linux) · AAX (Pro Tools, see below)
 
 ## Download
 
@@ -82,6 +82,18 @@ Optional installer: install Inno Setup 6 and run
 If you put this folder in a GitHub repository, `.github/workflows/build.yml` builds the Windows installer,
 the macOS installer and a Linux build on every push, runs the tests and pluginval, and attaches the
 installers to a release when you push a tag such as `v1.0.0`.
+
+## Pro Tools (AAX)
+
+Pro Tools only loads AAX plugins, and Avid requires two things that must be done in your own name:
+
+1. Join the free AAX developer program at <https://developer.avid.com/aax>, download the AAX SDK,
+   and request a **Pro Tools Developer** activation (it loads unsigned plugins for testing).
+2. To run in normal Pro Tools, plugins must be signed with **PACE** tools. Email audiosdk@avid.com
+   ("PACE Eden Signing Tools Request") with a plugin overview and a screen recording of it running in
+   Pro Tools Developer. Avid provides the tools free of charge.
+
+Then build with `-DOL4_AAX_SDK=/path/to/aax-sdk` and sign the `.aaxplugin` with PACE `wraptool`.
 
 ## License
 
