@@ -1,5 +1,5 @@
 /*
- * OL-4 opto leveler engine (v3.0) — C++ port of opto-engine.js, line for line.
+ * OL-4 opto leveler engine (v3.1) — C++ port of opto-engine.js, line for line.
  * Physical model of a late-70s solid-state electro-optical compressor/limiter (LA-4 / LA-4A style).
  *
  * Signal path: balanced op-amp input (RC4136, slew-limited) -> LOW-range gain stage
@@ -184,8 +184,8 @@ private:
 
     // fitted per ratio position (index order 2,4,8,12,20) — same table as the JS engine
     static constexpr double kGamma = 0.92;
-    static constexpr double kTauRise = 0.0120, kRiseLight = 0.12, kTauRel = 0.060, kTauRelMem = 0.70;
-    static constexpr double kMemUp = 2.0, kMemDn = 2.5;
+    static constexpr double kTauRise = 0.0100, kRiseLight = 0.15, kTauRel = 0.068, kTauRelMem = 0.76;
+    static constexpr double kMemUp = 1.6, kMemDn = 3.0;
     static constexpr double kSlewStock = 1.7, kSlewModded = 13.0;
     static constexpr double kGritStock = 0.023, kGritModded = 0.004;
     static constexpr double kDarkStock = 3.3, kDarkModded = 0.7;
