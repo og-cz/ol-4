@@ -5,7 +5,6 @@
 ---
 
 A solid-state opto compressor/limiter plugin modeled on the behavior of the late-70s UREI LA-4 / LA-4A.
-Independent project; not affiliated with Universal Audio, UREI or JBL.
 
 **Formats:** VST3 (Windows, macOS, Linux) · AU (macOS) · Standalone app · LV2 (Linux) · AAX (Pro Tools, see below)
 
