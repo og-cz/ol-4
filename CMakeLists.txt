@@ -22,6 +22,9 @@ set(OL4_FORMATS VST3 Standalone)
 if(APPLE)
     list(APPEND OL4_FORMATS AU)
 endif()
+if(UNIX AND NOT APPLE)
+    list(APPEND OL4_FORMATS LV2)
+endif()
 
 juce_add_plugin(OL4
     COMPANY_NAME "OL Audio"
@@ -39,6 +42,7 @@ juce_add_plugin(OL4
     EDITOR_WANTS_KEYBOARD_FOCUS FALSE
     VST3_CATEGORIES Fx Dynamics
     AU_MAIN_TYPE kAudioUnitType_Effect
+    LV2URI "https://github.com/olaudio/ol4"
     COPY_PLUGIN_AFTER_BUILD FALSE
     NEEDS_WEB_BROWSER FALSE
     NEEDS_CURL FALSE)
