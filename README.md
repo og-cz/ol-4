@@ -1,9 +1,15 @@
 # OL-4 Optical Leveler
 
+[![Downloads](https://img.shields.io/github/downloads/og-cz/ol4-optical-leveler/total?label=Downloads&color=6b5b3a)](https://github.com/og-cz/ol4-optical-leveler/releases) [![Platform](https://img.shields.io/badge/Platform-Windows%20%7C%20macOS%20%7C%20Linux-0078D6)](#download) [![Formats](https://img.shields.io/badge/Formats-VST3%20%7C%20AU%20%7C%20LV2%20%7C%20AAX-556b2f)](#download) [![License](https://img.shields.io/badge/License-AGPL--3.0-blue)](#license)
+
+---
+
 A solid-state opto compressor/limiter plugin modeled on the behavior of the late-70s UREI LA-4 / LA-4A.
 Independent project; not affiliated with Universal Audio, UREI or JBL.
 
 **Formats:** VST3 (Windows, macOS, Linux) · AU (macOS) · Standalone app · LV2 (Linux) · AAX (Pro Tools, see below)
+
+<img src="docs/screenshot.webp" alt="OL-4 Optical Leveler, powered on (top) and off (bottom)" width="100%">
 
 ## Download
 
