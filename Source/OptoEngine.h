@@ -4,7 +4,7 @@
  *
  * Signal path: balanced op-amp input (RC4136, slew-limited) -> LOW-range gain stage
  *   -> attenuator: build-out resistor + photocell, gain = 1/(1+G)
- *   -> output op-amp (slew + HF grit)
+ *   -> output op-amp (slew + HF grit) -> output transformer (weight, core saturation)
  * Sidechain (LA-4A): LED driven mostly by the attenuated signal (feedback) plus a little
  *   of the input (feedforward), 4x interpolated; soft diode turn-on (2:1 = soft knee);
  *   CdS photocell rises faster with more light, recovers in the conductance domain,
@@ -137,6 +137,14 @@ public:
 
                 y *= invSens * outS;
                 y += h2 * y * y;
+                const Biquad& ls = lowShelf;
+                const double lo = ls.b0 * y + st.ls1[c];
+                st.ls1[c] = ls.b1 * y - ls.a1 * lo + st.ls2[c];
+                st.ls2[c] = ls.b2 * y - ls.a2 * lo;
+                y = lo;
+                st.lf[c] = cLf * st.lf[c] + (1 - cLf) * y;
+                const double t = st.lf[c];
+                y += xfmr * (std::tanh(t * 0.8) / 0.8 - t);
                 const double dy = y - st.dcx[c] + cDc * st.dcy[c];
                 st.dcx[c] = y; st.dcy[c] = dy; y = dy;
                 const double ay = std::abs(y);
