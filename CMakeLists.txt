@@ -43,7 +43,20 @@ juce_add_plugin(OL4
     NEEDS_WEB_BROWSER FALSE
     NEEDS_CURL FALSE)
 
-target_sources(OL4 PRIVATE Source/PluginProcessor.cpp)
+juce_add_binary_data(OL4Art SOURCES
+    Resources/plate.jpg
+    Resources/knob.png
+    Resources/layout.json
+    Resources/crop_skirt_thr_0.png Resources/crop_skirt_thr_1.png Resources/crop_skirt_thr_2.png
+    Resources/crop_skirt_thr_3.png Resources/crop_skirt_thr_4.png
+    Resources/crop_skirt_out_0.png Resources/crop_skirt_out_1.png Resources/crop_skirt_out_2.png
+    Resources/crop_tog_pwr_0.png Resources/crop_tog_pwr_1.png
+    Resources/crop_tog_st_0.png Resources/crop_tog_st_1.png
+    Resources/crop_led_pwr_0.png Resources/crop_led_pwr_1.png
+    Resources/crop_led_ovl_0.png Resources/crop_led_ovl_1.png)
+set_target_properties(OL4Art PROPERTIES POSITION_INDEPENDENT_CODE ON)
+
+target_sources(OL4 PRIVATE Source/PluginProcessor.cpp Source/PluginEditor.cpp)
 
 target_compile_definitions(OL4 PUBLIC
     JUCE_WEB_BROWSER=0
@@ -53,6 +66,7 @@ target_compile_definitions(OL4 PUBLIC
 
 target_link_libraries(OL4
     PRIVATE
+        OL4Art
         juce::juce_audio_utils
     PUBLIC
         juce::juce_recommended_config_flags

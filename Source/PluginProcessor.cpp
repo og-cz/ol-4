@@ -1,4 +1,5 @@
 #include "PluginProcessor.h"
+#include "PluginEditor.h"
 
 using APVTS = juce::AudioProcessorValueTreeState;
 
@@ -15,6 +16,8 @@ APVTS::ParameterLayout OL4Processor::createLayout()
                                                   AudioParameterFloatAttributes()
                                                       .withStringFromValueFunction ([] (float v, int) { auto d = (v - 5.0f) * 4.0f; return (d > 0 ? "+" : "") + String (d, 1) + " dB"; })));
     l.add (std::make_unique<AudioParameterChoice> (ParameterID { "ratio", 1 }, "Ratio", StringArray { "2:1", "4:1", "8:1", "12:1", "20:1" }, 1));
+    l.add (std::make_unique<AudioParameterChoice> (ParameterID { "meter", 1 }, "Meter", StringArray { "GR", "+4", "+8" }, 0,
+                                                   AudioParameterChoiceAttributes().withAutomatable (false)));
     l.add (std::make_unique<AudioParameterBool> (ParameterID { "link", 1 }, "Stereo Link", true));
     l.add (std::make_unique<AudioParameterBool> (ParameterID { "power", 1 }, "Power", true));
     return l;
@@ -79,7 +82,7 @@ void OL4Processor::processBlock (juce::AudioBuffer<float>& buffer, juce::MidiBuf
     if (engine.overloaded()) overloadCount.fetch_add (1);
 }
 
-juce::AudioProcessorEditor* OL4Processor::createEditor() { return new juce::GenericAudioProcessorEditor (*this); }
+juce::AudioProcessorEditor* OL4Processor::createEditor() { return new OL4Editor (*this); }
 
 void OL4Processor::getStateInformation (juce::MemoryBlock& destData)
 {
