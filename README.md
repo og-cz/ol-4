@@ -28,17 +28,105 @@ Get the latest installer for Windows or macOS from **Releases**.
 
 Drag knobs up/down (Shift for fine), scroll wheel works, double-click resets. Click or drag the outer rings.
 
-## What is modeled
+## How it sounds
 
-* Sidechain: LED driven mostly by the attenuated signal plus a little of the input (LA-4A topology),
-  soft diode turn-on (2:1 is a soft knee), CdS photocell with light-dependent attack and
-  program-dependent "memory" release.
-* Attack 1–10 ms (63 %), release 0.1–1 s depending on how long it has been compressing (manual specs).
-* RC4136 op-amp slew and upper-mid grit, darkening under heavy gain reduction, output transformer weight.
-* Zero latency; identical output for any buffer size; 44.1–192 kHz.
+The LA-4 is the solid-state member of the LA family. It has the same light-based "leveling" feel as the
+LA-2A, but no tubes, so it is cleaner and a little faster. Engineers describe it as smooth on vocals and
+bass, darker as you push it, and hard to make sound bad.
 
-The bench in the web prototype checks 40 measurements against the LA-4 manual.
-The exact knee and darkening are estimates from published notes; a recording through a real unit would refine them.
+* **Smooth, program-dependent leveling.** Short peaks are caught and released quickly; long, loud passages
+  are held down and let go slowly. It reacts to the material instead of to fixed attack and release settings.
+* **2:1 is the gentle setting.** It is a soft knee that starts easing in about 12 dB below the threshold,
+  which is why it is the classic choice for tracking vocals (1–2 dB on the loudest words).
+* **4:1 levels, 8:1 and up limit.** Higher positions grab harder and faster and hold the output almost
+  flat: at 20:1 the output rises less than 1 dB over 16 dB of extra input.
+* **It darkens when you lean on it.** Past the first couple of dB of reduction the top end softens
+  (about −2.6 dB at 10 kHz with 8 dB of reduction), and very hot input picks up a little upper-mid grit,
+  like the stock RC4136 op-amps in the original.
+* **The low end stays solid.** The output transformer adds a touch of weight (+0.4 dB at 60 Hz). There is
+  no sidechain low-cut, so a heavy bass note pulls the whole signal down, the way the hardware does.
+
+## How it works
+
+```mermaid
+flowchart LR
+    IN([Input]) --> OPIN["Input op-amps<br/><i>slew-limited</i>"]
+    OPIN --> ATT["Photocell attenuator<br/><i>gain = 1 / (1 + G)</i>"]
+    ATT --> OPOUT["Output op-amps<br/><i>slew, grit, darkening</i>"]
+    OPOUT --> XF["Transformer<br/><i>weight, core saturation</i>"]
+    XF --> OUT([Output])
+
+    ATT -. "mostly (feedback)" .-> SC{{"Sidechain<br/><i>4× resolution</i>"}}
+    OPIN -. "a little (feedforward)" .-> SC
+    SC --> LED["LED<br/><i>soft turn-on</i>"]
+    LED -- light --> CELL["CdS photocell<br/><i>attack, recovery, memory</i>"]
+    CELL -- "conductance G" --> ATT
+```
+
+**Gain element.** As in the hardware, the audio passes a series resistor and a light-dependent resistor
+(photocell) to ground. The more light the LED gives, the lower the cell's resistance and the more signal is
+shunted away: gain = 1 / (1 + G), where G is the cell's conductance relative to the series resistor.
+
+**Sidechain (LA-4A topology).** The LED is driven mainly by the signal *after* the attenuator, plus a small
+share of the signal *before* it. The feedback part gives the smooth opto character; the small feedforward
+part keeps limiting flat once the cell runs out of range. Each Ratio position sets the LED drive and that
+feed mix, fitted so every position measures its nominal ratio. The sidechain runs at 4× resolution, so it
+behaves the same at 44.1, 96 and 192 kHz.
+
+**LED turn-on.** A diode doesn't switch on abruptly, so the light rises smoothly with drive. That makes the
+knee soft; it is softest at 2:1.
+
+**Photocell (CdS).** The model reproduces three traits of the cell:
+
+| Trait | What it does | Measured |
+|---|---|---|
+| Light-dependent attack | Louder jumps make the cell react faster | 1.2–9.8 ms to 63 % (manual: 1–10 ms) |
+| Two-stage recovery | Fast at first, then a slow tail as the cell goes dark | first half in ~0.5 s, the next quarter takes almost as long again |
+| Memory | The longer it has compressed, the slower it lets go | 0.10 s after a short hit, ~1.0 s after 10 s of limiting (manual: 0.1–1 s) |
+
+Higher Ratio positions drive the LED harder, so they also attack and release faster (at +10 dB: 6.3 ms at
+2:1 vs 1.8 ms at 20:1), as measured on real units.
+
+**Op-amps and transformer.** The original's RC4136 op-amps are slow (slew-limited). The model limits slew the
+same way, adds slight upper-mid non-linearity when driven hot, and softens the top end as gain reduction
+rises. The output transformer adds slight low-end weight and gentle saturation of deep bass. With no
+compression the response stays within the manual's ±0.5 dB, 20 Hz–20 kHz.
+
+**Calibration**
+
+* 0 dBFS = +20 dBu (the unit's maximum input).
+* Threshold: the level for 1 dB of gain reduction is (10 − 5.6 × knob) dBFS; knob 0 = off. At 2:1 it is a
+  further 16 dB lower, as the manual describes.
+* Output Level: ±20 dB, 5 = unity. Changes glide over 8 ms, so there is no zipper noise.
+* Meter: VU ballistics (about 300 ms rise, slight overshoot). GR mode rests at 0 VU and swings left with
+  gain reduction; +4 / +8 show output level.
+* Stereo: the louder channel drives both, so the image never shifts.
+* Power off: bypass with an 8 ms crossfade; once settled the output is bit-identical to the input.
+* Zero latency and no lookahead (safe to track through), same output at any buffer size, ~1.5 s tail.
+
+## Measurements
+
+Selected results from the 40-check bench, run on the same engine code the plugin uses:
+
+| Check | Target (LA-4 manual / published notes) | Measured |
+|---|---|---|
+| Ratio 2 / 4 / 8 / 12 / 20 : 1 (2→12 dB GR) | nominal | 1.94 / 3.96 / 7.73 / 11.50 / 19.78 |
+| Gain reduction at the threshold level | 1 dB | 1.09–1.12 dB |
+| Attack, 63 % | 1–10 ms | 1.2–9.8 ms |
+| Release, 63 % | 100 ms–1 s | 102 ms (short hit) → 981 ms (10 s of limiting) |
+| Frequency response, no compression | ±0.5 dB | −0.08 dB (10 kHz vs 200 Hz) |
+| THD, 1 kHz, no compression | clean | 0.028 % |
+| THD, 100 Hz, 20:1 hard limiting | low | 0.27 % |
+| Gain-reduction overshoot, jumps up to +30 dB | none | 0.00 dB |
+| Latency | 0 | 0 samples |
+
+**What is estimated.** Attack and release times, ratios, threshold and frequency response follow the manual.
+The exact knee shape and how much it darkens come from technicians' and owners' published notes, not from
+measuring a real unit, and two vintage LA-4s differ anyway because their photocells vary. A recording
+through a real unit would refine these.
+
+**References:** UREI LA-4 manual (1980); Eddie Ciletti's LA-4 articles (Tangible Technology, Tape Op);
+GroupDIY LA-4 / LA-4A threads; DIY Recording Equipment's OLA5 design notes.
 
 ## Build it yourself
 
