@@ -1,0 +1,23 @@
+OL-4 Optical Leveler for Windows (64-bit)
+
+EASY WAY
+  Run "OL-4-Windows-Installer-1.0.0.exe". It puts the VST3 in
+  C:\Program Files\Common Files\VST3 and the Standalone app in Program Files.
+  Windows may show "Windows protected your PC" because the installer is not code-signed yet:
+  click "More info" then "Run anyway".
+
+MANUAL WAY
+  Copy the folder "OL-4 Optical Leveler.vst3" into
+  C:\Program Files\Common Files\VST3
+
+FL STUDIO
+  Options > Manage plugins > Find installed plugins (or "Find more plugins").
+  Then add it from the mixer: Mixer insert > slot > More plugins > OL-4 Optical Leveler.
+
+OTHER DAWS
+  Ableton Live, Cubase, Studio One, Reaper and Bitwig find VST3s in the folder above
+  after a plugin rescan.
+
+PRO TOOLS
+  Pro Tools only loads AAX plugins. AAX needs Avid's free developer program and PACE signing;
+  see README for how to enable it.
