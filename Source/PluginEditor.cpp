@@ -245,6 +245,21 @@ void OL4Editor::mouseDoubleClick (const MouseEvent& e)
     }
 }
 
+void OL4Editor::mouseWheelMove (const MouseEvent& e, const MouseWheelDetails& w)
+{
+    const auto c = hit (toImg (e.position));
+    const float d = std::abs (w.deltaY) > 0.0f ? w.deltaY : w.deltaX;
+    if (std::abs (d) <= 0.0f) return;
+    if (c == Ctl::Threshold || c == Ctl::Output)
+    {
+        auto* p = param (c);
+        const float v = jlimit (0.0f, 10.0f, p->convertFrom0to1 (p->getValue()) + (d > 0 ? 1 : -1) * (e.mods.isShiftDown() ? 0.05f : 0.2f));
+        p->beginChangeGesture(); p->setValueNotifyingHost (p->convertTo0to1 (v)); p->endChangeGesture();
+        showTip (c);
+    }
+    else if (c == Ctl::Ratio || c == Ctl::Meter) { stepDiscrete (c, d > 0 ? 1 : -1); showTip (c); }
+}
+
 // ---------------------------------------------------------------------------------------------- timer
 void OL4Editor::timerCallback()
 {

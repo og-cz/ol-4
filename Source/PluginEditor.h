@@ -21,6 +21,7 @@ public:
     void mouseDrag (const juce::MouseEvent&) override;
     void mouseUp (const juce::MouseEvent&) override;
     void mouseDoubleClick (const juce::MouseEvent&) override;
+    void mouseWheelMove (const juce::MouseEvent&, const juce::MouseWheelDetails&) override;
     void mouseExit (const juce::MouseEvent&) override;
 
     static constexpr int kImgW = 2160, kPlateH = 890, kImgH = kPlateH;
