@@ -124,6 +124,16 @@ public:
                 st.hpx[c] = y; st.hp[c] = hpv;
                 y -= grit * hpv * hpv * hpv;
 
+                st.gs[c] += cGs * (gr - st.gs[c]);
+                if ((ctr & 31) == 0) {
+                    const double dv = std::max(0.0, st.gs[c] - 0.8);
+                    shelf[c] = shelfCoefs(-darkMax * (1 - std::exp(-dv / 4)), false);
+                }
+                const Biquad& sh = shelf[c];
+                const double o = sh.b0 * y + st.z1[c];
+                st.z1[c] = sh.b1 * y - sh.a1 * o + st.z2[c];
+                st.z2[c] = sh.b2 * y - sh.a2 * o;
+                y = o;
 
                 y *= invSens * outS;
                 y += h2 * y * y;
